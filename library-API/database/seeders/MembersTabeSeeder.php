@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use DB;
+use Illuminate\Support\Facades\Hash;
 
 class MembersTabeSeeder extends Seeder
 {
@@ -19,6 +21,20 @@ class MembersTabeSeeder extends Seeder
                 'email' => 'admin@gmail.com',
                 'password' => HASH::make('123'),
                 'role' => 'Admin',
+            ],
+            //Librarian
+            [
+                'name' => 'Librarian',
+                'email' => 'librarian@gmail.com',
+                'password' => HASH::make('123'),
+                'role' => 'Librarian',
+            ],
+            //Memeber
+            [
+                'name' => 'Member',
+                'email' => 'member@gmail.com',
+                'password' => HASH::make('123'),
+                'role' => 'Member',
             ]
             ]);
     }
