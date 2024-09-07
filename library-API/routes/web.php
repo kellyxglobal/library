@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LibrarianController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\AuthorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,13 +33,34 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-//Retrieving Admin User only
-Route::get('admin/dashboard', [AdminController::class, 'AdminDashboard'])->name('admin.Dashboard');
+
+
+//All Author Route
+Route::controller(AdminController::class)->group(function(){
+    Route::get('/admin/dashboard', 'AdminDashboard')->name('admin.dashboard');
+    Route::get('/all/admin', 'AllAdmin')->name('all.admin');
+    Route::get('/add/admin' , 'AddAdmin')->name('add.admin');
+    Route::post('/admin/user/store' , 'AdminUserStore')->name('admin.user.store');
+
+    Route::get('/edit/admin/role/{id}' , 'EditAdminRole')->name('edit.admin.role');
+
+    Route::post('/admin/user/update/{id}' , 'AdminUserUpdate')->name('admin.user.update');
+
+    Route::get('/delete/admin/role/{id}' , 'DeleteAdminRole')->name('delete.admin.role');
+});
+
 
 //Retrieving Librarian User only
 Route::get('librarian/dashboard', [LibrarianController::class, 'LibrarianDashboard'])->name('librarin.Dashboard');
 
 //Retrieving Librarian User only
 Route::get('member/dashboard', [MemberController::class, 'MemberDashboard'])->name('member.Dashboard');
+
+
+
+//All Author Route
+Route::controller(AuthorController::class)->group(function(){
+    Route::get('/all/author', 'AllAuthor')->name('all.author');
+});
 
 
