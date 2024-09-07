@@ -8,6 +8,9 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\BorrowRecordController;
+use App\Http\Controllers\RoleController;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,55 +39,93 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-
-//All Admin Route
-Route::controller(AdminController::class)->group(function(){
-    Route::get('/admin/dashboard', 'AdminDashboard')->name('admin.dashboard');
-    Route::get('/all/admin', 'AllAdmin')->name('all.admin');
-    Route::get('/add/admin' , 'AddAdmin')->name('add.admin');
-    Route::post('/admin/user/store' , 'AdminUserStore')->name('admin.user.store');
-
-    Route::get('/edit/admin/role/{id}' , 'EditAdminRole')->name('edit.admin.role');
-
-    Route::post('/admin/user/update/{id}' , 'AdminUserUpdate')->name('admin.user.update');
-
-    Route::get('/delete/admin/role/{id}' , 'DeleteAdminRole')->name('delete.admin.role');
+Route::controller(RoleController::class)->group(function(){
+    Route::get('/all/permission','AllPermission')->name('all.permission');
 });
 
+Route::controller(RoleController::class)->group(function(){
+    Route::get('/all/roles','Role')->name('all.roles');
+});
+
+//All Admin Route Middleware
+Route::middleware(['auth','role:Admin'])->group(function() {
+    Route::get('/admin/dashboard', [AdminController::class, 'AdminDashboard'])->name('admin.dashboard');
+    Route::get('/all/admin', [AdminController::class, 'AllAdmin'])->name('all.admin');
+    Route::get('/add/admin', [AdminController::class, 'AddAdmin'])->name('add.admin');
+    Route::get('/admin/user/store', [AdminController::class, 'AdminUserStore'])->name('admin.user.store');
+    Route::get('/edit/admin/{id}', [AdminController::class, 'EditAdmin'])->name('edit.admin');
+    Route::get('/admin/user/update/{id}', [AdminController::class, 'AdminUserUpdate'])->name('admin.user.update');
+    Route::get('/delete/admin/{id}', [AdminController::class, 'DeleteAdminRole'])->name('delete.admin');
+
+
+//Admin All Book Route
+Route::controller(BookController::class)->group(function(){
+    Route::get('/books', 'index')->name('books.index');
+    Route::get('/books/{id}', 'show')->name('books.show');
+    Route::post('/books', 'store')->name('books.store');
+    Route::put('/books/{id}', 'update')->name('books.update');
+    Route::delete('/books/{id}', 'destroy')->name('books.destroy');
+
+});//End Admin Book Route
+
+//All Author Route
+Route::controller(AuthorController::class)->group(function(){
+    Route::get('/authors', 'index')->name('authors.index');
+    Route::get('/authors/{id}', 'show')->name('authors.show');
+    Route::post('/authors', 'store')->name('authors.store');
+    Route::put('/authors/{id}', 'update')->name('authors.update');
+    Route::delete('/authors/{id}', 'destroy')->name('authors.destroy');
+});
+
+// All BorrowRecordController route for admin
+Route::controller(BorrowRecordController::class)->group(function() {
+    Route::get('/borrow-records', 'index')->name('borrow-records.index');
+    Route::get('/borrow-records/{id}', 'show')->name('borrow-records.show');
+});//End Borrow route for admin
+
+});//End Admin group middleware
+
+
+
+Route::middleware(['auth','role:Librarian'])->group(function() {
+//All Route For Retrieving Librarian User only
+Route::get('/librarian/dashboard', [LibrarianController::class, 'LibrarianDashboard'])->name('librarian.dashboard');
 
 
 //All Book Route
 Route::controller(BookController::class)->group(function(){
-    Route::get('/all/books', 'AllBook')->name('all.books');
-    Route::get('/add/book', 'AddBook')->name('add.book');
-    Route::post('/save/book' , 'SaveBook')->name('save.book');
+    Route::get('/books', 'index')->name('books.index');
+    Route::get('/books/{id}', 'show')->name('books.show');
+    Route::post('/books', 'store')->name('books.store');
+    Route::put('/books/{id}', 'update')->name('books.update');
+    Route::delete('/books/{id}', 'destroy')->name('books.destroy');
 
-    Route::get('/edit/book/{id}' , 'EditBook')->name('edit.book');
+});//End Book route for librarian
 
-    Route::post('/book/update/{id}' , 'UpdateBook')->name('admin.book.update');
-
-    Route::get('/delete/book/{id}' , 'DeleteBook')->name('delete.book');
-
-    Route::post('/books/{id}/borrow', 'BorrowBook')-name('borrowBook');
-    Route::post('/books/{id}/return', 'returnBook')-name('returnBook');
-
-});
-
-//All Author Route
+//All Author Route for librarian
 Route::controller(AuthorController::class)->group(function(){
-    Route::get('/all/author', 'AllAuthor')->name('all.author');
-});
+    Route::get('/authors', 'index')->name('authors.index');
+    Route::get('/authors/{id}', 'show')->name('authors.show');
+    Route::post('/authors', 'store')->name('authors.store');
+    Route::put('/authors/{id}', 'update')->name('authors.update');
+    Route::delete('/authors/{id}', 'destroy')->name('authors.destroy');
+});//End Author route librarian
 
-//All Route For Retrieving Librarian User only
-Route::controller(LibrarianController::class)->group(function(){
-    Route::get('librarian/dashboard', 'LibrarianDashboard')->name('librarin.Dashboard');
+//BorrowRecordController route for Librarian
+Route::controller(BorrowRecordController::class)->group(function() {
+    Route::get('/borrow-records', 'index')->name('borrow-records.index');
+    Route::get('/borrow-records/{id}', 'show')->name('borrow-records.show');
+});//End Borrow route for librarian
 
-}); 
+});//End Librarian group middleware
+
 
 //All Route For Retrieving Member User only
-Route::controller(MemberController::class)->group(function(){
-    Route::get('member/dashboard', 'MemberController')->name('member.Dashboard');
-
-}); 
+Route::middleware(['auth', 'role:Member'])->group(function() {
+    Route::controller(BookController::class)->group(function(){
+        Route::post('/books/{id}/borrow', 'BorrowBook')->name('borrowBook');
+        Route::post('/books/{id}/return', 'ReturnBook')->name('returnBook');
+    });
+});
 
 
