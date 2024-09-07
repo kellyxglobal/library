@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LibrarianController;
+use App\Http\Controllers\MemberController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,3 +32,13 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+//Retrieving Admin User only
+Route::get('admin/dashboard', [AdminController::class, 'AdminDashboard'])->name('admin.Dashboard');
+
+//Retrieving Librarian User only
+Route::get('librarian/dashboard', [LibrarianController::class, 'LibrarianDashboard'])->name('librarin.Dashboard');
+
+//Retrieving Librarian User only
+Route::get('member/dashboard', [MemberController::class, 'MemberDashboard'])->name('member.Dashboard');
+
+
