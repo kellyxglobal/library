@@ -61,16 +61,19 @@ Route::middleware(['auth','role:Admin'])->group(function() {
 //Admin All Book Route
 Route::controller(BookController::class)->group(function(){
     Route::get('/books', 'index')->name('books.index');
+    Route::get('/books', 'pagination')->name('books.pagination');
     Route::get('/books/{id}', 'show')->name('books.show');
     Route::post('/books', 'store')->name('books.store');
     Route::put('/books/{id}', 'update')->name('books.update');
     Route::delete('/books/{id}', 'destroy')->name('books.destroy');
+    Route::get('/books/search', 'search')->name('books.search');
 
 });//End Admin Book Route
 
 //All Author Route
 Route::controller(AuthorController::class)->group(function(){
     Route::get('/authors', 'index')->name('authors.index');
+    Route::get('/authors', 'pagination')->name('authors.pagination');
     Route::get('/authors/{id}', 'show')->name('authors.show');
     Route::post('/authors', 'store')->name('authors.store');
     Route::put('/authors/{id}', 'update')->name('authors.update');
@@ -80,6 +83,7 @@ Route::controller(AuthorController::class)->group(function(){
 // All BorrowRecordController route for admin
 Route::controller(BorrowRecordController::class)->group(function() {
     Route::get('/borrow-records', 'index')->name('borrow-records.index');
+    Route::get('/borrow-records', 'pagination')->name('borrow-records.index');
     Route::get('/borrow-records/{id}', 'show')->name('borrow-records.show');
 });//End Borrow route for admin
 
@@ -95,16 +99,19 @@ Route::get('/librarian/dashboard', [LibrarianController::class, 'LibrarianDashbo
 //All Book Route
 Route::controller(BookController::class)->group(function(){
     Route::get('/books', 'index')->name('books.index');
+    Route::get('/books', 'pagination')->name('books.pagination');
     Route::get('/books/{id}', 'show')->name('books.show');
     Route::post('/books', 'store')->name('books.store');
     Route::put('/books/{id}', 'update')->name('books.update');
     Route::delete('/books/{id}', 'destroy')->name('books.destroy');
+    Route::get('/books/search', 'search')->name('books.search');
 
 });//End Book route for librarian
 
 //All Author Route for librarian
 Route::controller(AuthorController::class)->group(function(){
     Route::get('/authors', 'index')->name('authors.index');
+    Route::get('/authors', 'pagination')->name('authors.pagination');
     Route::get('/authors/{id}', 'show')->name('authors.show');
     Route::post('/authors', 'store')->name('authors.store');
     Route::put('/authors/{id}', 'update')->name('authors.update');
@@ -114,6 +121,7 @@ Route::controller(AuthorController::class)->group(function(){
 //BorrowRecordController route for Librarian
 Route::controller(BorrowRecordController::class)->group(function() {
     Route::get('/borrow-records', 'index')->name('borrow-records.index');
+    Route::get('/borrow-records', 'pagination')->name('borrow-records.pagination');
     Route::get('/borrow-records/{id}', 'show')->name('borrow-records.show');
 });//End Borrow route for librarian
 
@@ -122,9 +130,15 @@ Route::controller(BorrowRecordController::class)->group(function() {
 
 //All Route For Retrieving Member User only
 Route::middleware(['auth', 'role:Member'])->group(function() {
-    Route::controller(BookController::class)->group(function(){
+    Route::controller(BorrowRecordController::class)->group(function(){
         Route::post('/books/{id}/borrow', 'BorrowBook')->name('borrowBook');
         Route::post('/books/{id}/return', 'ReturnBook')->name('returnBook');
+    });
+
+    //Implemebting Search functonality
+    Route::controller(BookController::class)->group(function(){
+        Route::get('/books/search', 'search')->name('books.search');
+
     });
 });
 

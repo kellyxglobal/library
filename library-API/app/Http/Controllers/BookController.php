@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Book;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use Illuminate\Support\Facades\Validator;
@@ -30,12 +31,15 @@ class BookController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255', // Replace with your validation rules
+            'title' => 'required|string|max:255',
             'isbn' => 'required|string|unique:books|max:13',
+            'author_id' => 'required|exists:authors,id',
+            'published_date' => 'nullable|date',
+            'status' => 'required|in:Available,Borrowed',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422); // Unprocessable Entity
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $book = Book::create($request->all());
@@ -47,13 +51,15 @@ class BookController extends Controller
     // Route model binding
     public function update(Request $request, Book $book){
         $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255', // Replace with your validation rules
-            'isbn' => 'required|string|unique:books,isbn,' . $book->id . ',id|max:13',
-            // ... other validation rules
+            'title' => 'required|string|max:255',
+            'isbn' => 'required|string|unique:books|max:13',
+            'author_id' => 'required|exists:authors,id',
+            'published_date' => 'nullable|date',
+            'status' => 'required|in:Available,Borrowed',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422); // Unprocessable Entity
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
         $book->update($request->all());
@@ -85,6 +91,28 @@ class BookController extends Controller
         return redirect()->back();
 
     }//End Method*/
+
+    //Implementing Search Functionality
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        $books = Book::where('title', 'like', "%$query%")
+            ->orWhere('author', 'like', "%$query%")
+            ->orWhere('isbn', 'like', "%$query%")
+            ->get();
+
+        return response()->json($books);
+    }
+
+
+    //Implementing Pagination Functionality
+    public function pagination(Request $request){
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);
+        $books = Book::paginate($perPage, ['*'], 'page', $page);
+        return response()->json($books);
+    }
 
 
 }
